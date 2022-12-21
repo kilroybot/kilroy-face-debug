@@ -1,0 +1,10 @@
+*
+!kilroy_face_debug/src/**
+!kilroy_face_debug/tests/**
+!kilroy_face_debug/pyproject.toml
+!kilroy_face_debug/poetry.lock
+!kilroy_face_debug/LICENSE
+!kilroy_face_debug/README.md
+!environment.yaml
+!requirements.txt
+!entrypoint.sh
