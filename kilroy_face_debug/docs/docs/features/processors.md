@@ -1,6 +1,6 @@
 # Processors
 
-Processors are a way to handle different types of post.
+Processors are a way to handle different types of posts.
 They are able to convert between
 internal and external representations of posts.
 
