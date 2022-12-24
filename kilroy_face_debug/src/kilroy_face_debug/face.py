@@ -314,6 +314,8 @@ class DebugFaceBase(Face[State], ABC):
         else:
             category = params.score_modifier_type
 
+        if category is None:
+            return None
         return await cls._load_generic(
             directory / "score_modifier",
             ScoreModifier,
