@@ -38,8 +38,11 @@ COPY ./kilroy_face_debug/LICENSE ./kilroy_face_debug/README.md ./
 RUN poetry build -f wheel && \
     python -m pip install --no-deps --no-index --no-cache-dir --find-links=dist kilroy-face-debug
 
+RUN --mount=type=cache,target=/etc/torch-tmp \
+    TORCH_HOME=/etc/torch-tmp kilroy-face-debug-fetch-models && \
+    mkdir -p /etc/torch && \
+    cp -rup /etc/torch-tmp/* /etc/torch
 ENV TORCH_HOME=/etc/torch
-RUN kilroy-face-debug-fetch-models
 
 # add entrypoint
 COPY ./entrypoint.sh ./entrypoint.sh
@@ -61,8 +64,11 @@ COPY ./kilroy_face_debug/LICENSE ./kilroy_face_debug/README.md ./
 RUN poetry build -f wheel && \
     python -m pip install --no-deps --no-index --no-cache-dir --find-links=dist kilroy-face-debug
 
+RUN --mount=type=cache,target=/etc/torch-tmp \
+    TORCH_HOME=/etc/torch-tmp kilroy-face-debug-fetch-models && \
+    mkdir -p /etc/torch && \
+    cp -rup /etc/torch-tmp/* /etc/torch
 ENV TORCH_HOME=/etc/torch
-RUN kilroy-face-debug-fetch-models
 
 # add entrypoint
 COPY ./entrypoint.sh ./entrypoint.sh
