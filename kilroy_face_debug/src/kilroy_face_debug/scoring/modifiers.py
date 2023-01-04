@@ -103,6 +103,8 @@ class ToxicityScoreModifier(
         await background(ToxicityModelLoader.release)
 
     async def modify(self, post: Post, score: float) -> float:
+        if post.data.text is None:
+            return score
         async with self.state.read_lock() as state:
             content = post.data.text.content
             toxicity = state.detoxify.predict(content)["toxicity"]
