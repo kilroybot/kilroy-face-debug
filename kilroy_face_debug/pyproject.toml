@@ -17,6 +17,7 @@ typer = { version = "^0.6", extras = ["all"] }
 kilroy-face-server-py-sdk = "~0.9"
 platformdirs = "^2.5"
 detoxify = "^0.5"
+tweetnlp = "^0.4"
 numpy = "^1.23"
 
 [tool.poetry.group.poe.dependencies]

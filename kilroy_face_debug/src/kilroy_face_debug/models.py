@@ -3,6 +3,7 @@ from threading import Lock
 from typing import Optional, Generic, TypeVar
 
 from detoxify import Detoxify
+from tweetnlp import Sentiment
 
 ModelType = TypeVar("ModelType")
 
@@ -10,6 +11,8 @@ ModelType = TypeVar("ModelType")
 def fetch_models() -> None:
     ToxicityModelLoader.get()
     ToxicityModelLoader.release()
+    SentimentModelLoader.get()
+    SentimentModelLoader.release()
 
 
 class ModelLoader(ABC, Generic[ModelType]):
@@ -47,3 +50,9 @@ class ToxicityModelLoader(ModelLoader[Detoxify]):
     @classmethod
     def load(cls) -> Detoxify:
         return Detoxify("multilingual")
+
+
+class SentimentModelLoader(ModelLoader[Sentiment]):
+    @classmethod
+    def load(cls) -> Sentiment:
+        return Sentiment()
