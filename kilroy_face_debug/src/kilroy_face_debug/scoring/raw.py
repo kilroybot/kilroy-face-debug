@@ -6,8 +6,9 @@ from random import random
 from detoxify import Detoxify
 from kilroy_face_server_py_sdk import Categorizable, classproperty, normalize
 from kilroy_server_py_utils import Configurable, background
+from tweetnlp import Sentiment
 
-from kilroy_face_debug.models import ToxicityModelLoader
+from kilroy_face_debug.models import ToxicityModelLoader, SentimentModelLoader
 from kilroy_face_debug.post import Post
 
 
@@ -62,3 +63,41 @@ class ToxicityScorer(Scorer, Configurable[ToxicityScorerState]):
             if not post.data.text:
                 return 0.0
             return state.detoxify.predict(post.data.text.content)["toxicity"]
+
+
+# Toxicity
+
+
+@dataclass
+class PositivityScorerState:
+    model: Sentiment
+
+
+class PositivityScorer(Scorer, Configurable[PositivityScorerState]):
+    async def _build_default_state(self) -> PositivityScorerState:
+        return PositivityScorerState(
+            model=await background(SentimentModelLoader.get),
+        )
+
+    @classmethod
+    async def _save_state(
+        cls, state: PositivityScorerState, directory: Path
+    ) -> None:
+        pass
+
+    async def _load_saved_state(
+        self, directory: Path
+    ) -> PositivityScorerState:
+        return await self._build_default_state()
+
+    async def cleanup(self) -> None:
+        await background(SentimentModelLoader.release)
+
+    async def score(self, post: Post) -> float:
+        async with self.state.read_lock() as state:
+            if not post.data.text:
+                return 0.0
+            pred = state.model.predict(
+                post.data.text.content, return_probability=True
+            )
+            return pred["probability"]["positive"]
