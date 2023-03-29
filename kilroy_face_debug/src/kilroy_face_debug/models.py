@@ -1,7 +1,10 @@
+from abc import ABC, abstractmethod
 from threading import Lock
-from typing import Optional
+from typing import Optional, Generic, TypeVar
 
 from detoxify import Detoxify
+
+ModelType = TypeVar("ModelType")
 
 
 def fetch_models() -> None:
@@ -9,16 +12,25 @@ def fetch_models() -> None:
     ToxicityModelLoader.release()
 
 
-class ToxicityModelLoader:
-    model: Optional[Detoxify] = None
+class ModelLoader(ABC, Generic[ModelType]):
+    model: Optional[ModelType] = None
     reference_count: int = 0
     lock: Lock = Lock()
 
     @classmethod
-    def get(cls) -> Detoxify:
+    @abstractmethod
+    def load(cls) -> ModelType:
+        pass
+
+    @classmethod
+    def unload(cls) -> None:
+        pass
+
+    @classmethod
+    def get(cls) -> ModelType:
         with cls.lock:
             if cls.model is None:
-                cls.model = Detoxify("multilingual")
+                cls.model = cls.load()
             cls.reference_count += 1
             return cls.model
 
@@ -27,4 +39,11 @@ class ToxicityModelLoader:
         with cls.lock:
             cls.reference_count -= 1
             if cls.reference_count == 0:
+                cls.unload()
                 cls.model = None
+
+
+class ToxicityModelLoader(ModelLoader[Detoxify]):
+    @classmethod
+    def load(cls) -> Detoxify:
+        return Detoxify("multilingual")
